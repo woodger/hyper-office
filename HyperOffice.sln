@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29424.173
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HyperOffice", "HyperOffice.csproj", "{8E223508-3D39-44E0-A0F0-9C189F706656}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E223508-3D39-44E0-A0F0-9C189F706656}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E223508-3D39-44E0-A0F0-9C189F706656}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E223508-3D39-44E0-A0F0-9C189F706656}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E223508-3D39-44E0-A0F0-9C189F706656}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2A127D84-2C06-4555-987F-C585DF4164A0}
+	EndGlobalSection
+EndGlobal
