@@ -1,7 +1,7 @@
 ﻿namespace HyperOffice {
-  using Nancy.Hosting.Self;
   using System;
   using System.Configuration;
+  using Nancy.Hosting.Self;
 
   class Program {
     static void Main(string[] args) {
