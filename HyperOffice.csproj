@@ -52,8 +52,6 @@
   <ItemGroup>
     <Compile Include="App\Router.cs" />
     <Compile Include="App\DocumentService.cs" />
-    <Compile Include="App\Word\IWord.cs" />
-    <Compile Include="App\Word\WordDocument.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -62,6 +60,8 @@
     <None Include="packages.config" />
     <None Include="readme.md" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="Docs\windows.md" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -27,6 +27,8 @@ namespace HyperOffice.App {
 
         string fileName = documentService.TempUpload(file);
         File.Delete(fileName);
+
+        return "Accepted\n";
       });
     }
   }
