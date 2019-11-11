@@ -1,34 +1,40 @@
 ﻿using System;
-using System.IO;
 using System.Linq;
-using System.Configuration;
-using System.Collections;
 using Nancy;
 
 namespace HyperOffice.App {
   public class Router : NancyModule {
     public Router() {
-      this.Get("/", async (args) => {
-        return "Hello World, it's Nancy on .NET Core\n";
+      this.Post("/api/v1/documents/convert", (args) => {
+        HttpFile httpFile = this.Request.Files.FirstOrDefault();
+
+        if (httpFile == null) {
+          return 400;
+        }
+
+        Service service = new Service();
+
+        if (service.CheckIncludesType(httpFile) == false) {
+          return 400;
+        }
+
+        return service.ConvertWordToHtml(httpFile);
       });
 
-      this.Post("/api/v1/documents/convert", async (args) => {
-        HttpFile file = this.Request.Files.FirstOrDefault();
+      this.Post("/api/v1/documents/snapshot", (args) => {
+        HttpFile httpFile = this.Request.Files.FirstOrDefault();
 
-        if (file == null) {
+        if (httpFile == null) {
           return 400;
         }
 
-        DocumentService documentService = new DocumentService();
+        Service service = new Service();
 
-        if (documentService.IncludesType(file) == false) {
+        if (service.CheckIncludesType(httpFile) == false) {
           return 400;
         }
 
-        string fileName = documentService.TempUpload(file);
-        File.Delete(fileName);
-
-        return "Accepted\n";
+        return service.SnapshotWordDocument(httpFile);
       });
     }
   }

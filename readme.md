@@ -1,10 +1,19 @@
 # Hyper Office
 
-###### [Настройка Windows](Docs/windows.md)
+###### [Настройка Windows](docs/windows.md)
 
-Разработано с использованием `Nancy` - фреймворк для .Net.
+Разработано на языке `C#` на платформе .NET Framework 4.7 с использованием фреймворка `Nancy 2.0`.
 
 ## Руководство по началу работ
+
+Для изменения параметров запуска поправьте директиву `<appSettings>` `web.config` в корне проета:
+
+| Ключ | Значение | Описание |
+|------|----------|----------|
+| `env` | development | Устанавливает режим запуска приложения. Выбрать одно из потдерживаемых значений набора сред `DTAP` |
+| `address` | localhost | Для запуска приложения используется имя хоста или IP-адрес |
+| `port` | 80 | Запустит TCP-сервер, прослушивающий соединения на предоставленном хосте |
+| `page` | document.html | Имя страницы для преобразования в `html` |
 
 ### Настройка параметров запуска
 
@@ -15,6 +24,23 @@
   <appSettings>
     <add key="address" value="localhost" />
     <add key="port" value="80" />
+  </appSettings>
+```
+
+#### Переменные окружения
+
+Набор сред, используемых для `DTAP`:
+
+- [x] development
+- [ ] testing
+- [ ] acceptance
+- [x] production
+
+Задать требуемую переменную среды:
+
+```xml
+  <appSettings>
+    <add key="env" value="development" />
   </appSettings>
 ```
 
@@ -31,7 +57,7 @@ New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -
 
 ## API
 
-### Конвертировать документ
+### Конвертировать документ в HTML
 
 Преобразует файл с расширением `.doc` и `.docx` в веб-страницу.
 
@@ -41,3 +67,31 @@ New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -
 curl -X POST http://localhost/api/v1/documents/convert \
   -F "file=@document.doc;type=application/msword"
 ```
+
+Обязательный параметр `type`, один из:
+
+- application/msword
+- application/vnd.openxmlformats-officedocument.wordprocessingml.document
+
+Возвращаемое значение: `Binary` - MIME-type `application/zip`.
+Содержимое файла:
+
+- `document.html` страница в формате `html` как указано в `web.config`.
+- `document.files` директория, содержащая перечисления ресурсов, необходимые для отображения `document.html`.
+
+При неверном запросе вернет статус-код `400`.
+
+### Получить снимки страниц документа
+
+Запрос с использованием интерфейса `curl`:
+
+```bash
+curl -X POST http://localhost/api/v1/documents/snapshot \
+  -F "file=@document.doc;type=application/msword"
+```
+
+Возвращаемое значение: `Binary` - MIME-type `application/zip`.
+Содержимое возвращаемого файла `zip` состоит из списка изображений в формате `.png`.
+Имя файла изображения соответствует номерам страниц.
+
+В случае неверного запроса вернет статус-код `400`.
