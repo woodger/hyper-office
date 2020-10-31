@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HyperOffice.App.Providers.Excel {
-  class Application {
+namespace HyperOffice.App.Providers.Excel
+{
+  class Application
+  {
   }
 }

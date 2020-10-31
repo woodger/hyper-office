@@ -1,48 +1,42 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
-using System.IO.Compression;
 using Nancy;
 
 namespace HyperOffice.App
 {
   class DocumentService
   {
-    public Stream SnapshotWordDocument(HttpFile httpFile)
+    public string SnapshotWordDocument(HttpFile httpFile)
     {
       string env = ConfigurationManager.AppSettings.Get("env");
       bool wordVisible = (env == "development");
 
       string documentFileName = TempUpload(httpFile);
-      string sandboxPath = CreateGuidDirectory();
+      string dirName = CreateGuidDirectory();
 
       WordApplication wordApplication = new WordApplication(wordVisible);
       WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
 
-      wordDocument.SnapshotPages(sandboxPath);
+      wordDocument.SnapshotPages(dirName);
       wordDocument.Close();
       wordApplication.Quit();
 
-      return CreateZipFileFromDirectory(sandboxPath);
-
-      // File.Delete(documentFileName);
-      // Directory.Delete(sandboxPath, true);
-
-      // return contents;
+      return dirName;
     }
 
     /**
      * Трансфорать Word-документ в HTML
      */
 
-    public Stream ConvertWordToHtml(HttpFile httpFile)
+    public string ConvertWordToHtml(HttpFile httpFile)
     {
       string env = ConfigurationManager.AppSettings.Get("env");
       string pageBaseName = ConfigurationManager.AppSettings.Get("page");
 
       string documentFileName = TempUpload(httpFile);
-      string sandboxPath = CreateGuidDirectory();
-      string pageFileName = Path.Combine(sandboxPath, pageBaseName);
+      string dirName = CreateGuidDirectory();
+      string pageFileName = Path.Combine(dirName, pageBaseName);
       bool wordVisible = (env == "development");
 
       WordApplication wordApplication = new WordApplication(wordVisible);
@@ -53,26 +47,7 @@ namespace HyperOffice.App
       wordDocument.Close();
       wordApplication.Quit();
 
-      return CreateZipFileFromDirectory(sandboxPath);
-
-      // File.Delete(documentFileName);
-      // Directory.Delete(sandboxPath, true);
-
-      // return contents;
-    }
-
-    protected static Stream TransformToZip(string dirName)
-    {
-      return CreateZipFileFromDirectory(dirName);
-      // string contents = File.ReadAllText(@zipFileName);
-
-      // using (Stream stream = File.OpenWrite(zipFileName)) {
-      //   return stream;
-      // }
-
-      // File.Delete(zipFileName);
-
-      // return contents;
+      return dirName;
     }
 
     protected static string CreateGuidDirectory()
@@ -109,24 +84,6 @@ namespace HyperOffice.App
       }
 
       return documentFileName;
-    }
-
-    protected static Stream CreateZipFileFromDirectory(string dirName)
-    {
-      string tempPath = Path.GetTempPath();
-      string guidPath = Guid.NewGuid().ToString();
-
-      string baseName = string.Format(@"{0}.zip",
-        guidPath
-      );
-
-      string zipFileName = Path.Combine(tempPath, baseName);
-      ZipFile.CreateFromDirectory(dirName, zipFileName);
-
-      using (Stream stream = File.OpenRead(zipFileName))
-      {
-        return stream;
-      }
     }
   }
 }

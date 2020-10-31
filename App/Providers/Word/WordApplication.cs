@@ -1,21 +1,25 @@
 ﻿using System;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace HyperOffice.App {
-  class WordApplication {
+namespace HyperOffice.App
+{
+  class WordApplication
+  {
     public Word.Application Application;
 
-    public WordApplication(bool displayOn) {
+    public WordApplication(bool displayOn)
+    {
       Word.WdAlertLevel wdAlertLevel = Word.WdAlertLevel.wdAlertsMessageBox;
 
-      this.Application = new Word.Application {
+      this.Application = new Word.Application
+      {
         Visible = displayOn,
         DisplayAlerts = wdAlertLevel
       };
     }
 
-    public WordDocument OpenDocument(object FileName) {
-
+    public WordDocument OpenDocument(object FileName)
+    {
       // Открыть диалоговое окно Преобразование файла, если файл не находится в формате Microsoft Word
       object ConfirmConversions = false;
 
@@ -35,7 +39,8 @@ namespace HyperOffice.App {
       return new WordDocument(document);
     }
 
-    public void Quit() {
+    public void Quit()
+    {
       this.Application.Quit();
     }
   }

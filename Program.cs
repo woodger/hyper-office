@@ -2,9 +2,12 @@
 using System.Configuration;
 using Nancy.Hosting.Self;
 
-namespace HyperOffice {
-  class Program {
-    static void Main(string[] args) {
+namespace HyperOffice
+{
+  class Program
+  {
+    static void Main(string[] args)
+    {
       string address = ConfigurationManager.AppSettings.Get("address");
       string port = ConfigurationManager.AppSettings.Get("port");
 

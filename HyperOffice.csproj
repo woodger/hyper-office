@@ -73,11 +73,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="App\HttpServer\ZipStream.cs" />
     <Compile Include="App\Providers\Excel\Application.cs" />
     <Compile Include="App\Providers\Word\WordApplication.cs" />
     <Compile Include="App\Providers\Word\WordDocument.cs" />
-    <Compile Include="App\Router.cs" />
-    <Compile Include="App\Service.cs" />
+    <Compile Include="App\HttpServer\Router.cs" />
+    <Compile Include="App\Services\DocumentService.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

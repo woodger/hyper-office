@@ -5,17 +5,21 @@ using Word = Microsoft.Office.Interop.Word;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace HyperOffice.App {
-  class WordDocument {
+namespace HyperOffice.App
+{
+  class WordDocument
+  {
     public Word.Document Document;
     private readonly string BreakLineSymbol = System.Text.Encoding.Default.GetString(new byte[] { 11 });
     private readonly string BreakPageSymbol = System.Text.Encoding.Default.GetString(new byte[] { 12 });
 
-    public WordDocument(Word.Document document) {
+    public WordDocument(Word.Document document)
+    {
       this.Document = document;
     }
 
-    public object GetInfo() {
+    public object GetInfo()
+    {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
 
       Word.Range range = this.Document.Range();
@@ -37,7 +41,8 @@ namespace HyperOffice.App {
       int count = pages.Count;
       object[] dimensions = new object[count];
 
-      for (int i = 1; i <= count; i++) {
+      for (int i = 1; i <= count; i++)
+      {
         Word.Page page = pages[i];
 
         dimensions[(i - 1)] = new {
@@ -55,26 +60,37 @@ namespace HyperOffice.App {
       };
     }
 
-    public void SnapshotPages(string dirName) {
+    public void SnapshotPages(string dirName)
+    {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
       Word.Pages pages = this.Document.ActiveWindow.ActivePane.Pages;
 
-      for (int i = 0; i > pages.Count; i++) {
-        Word.Page page = pages[i];
+      int index = 0;
+
+      foreach (Word.Page page in pages)
+      {
+        index++;
         dynamic bytes = page.EnhMetaFileBits;
         MemoryStream stream = new MemoryStream(bytes);
 
         string fileName = string.Format(@"{0}{1}{2}.png",
           Path.GetFullPath(dirName),
           Path.DirectorySeparatorChar,
-          i.ToString()
+          index.ToString()
         );
 
         Image.FromStream(stream).Save(fileName, ImageFormat.Png);
       }
     }
 
-    private void MarkTransferPage(Word.Paragraph paragraph) {
+    private void SetupPageBreak(Word.Range range)
+    {
+      range.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
+      range.InsertBreak(Word.WdBreakType.wdLineBreak);
+    }
+
+    private void MarkTransferPage(Word.Paragraph paragraph)
+    {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
       Word.Range range = paragraph.Range;
       Word.Words words = range.Words;
@@ -82,23 +98,23 @@ namespace HyperOffice.App {
 
       int page = (int)last.Information[Word.WdInformation.wdActiveEndPageNumber];
 
-      for (int i = words.Count - 1; i > 0; i--) {
+      for (int i = words.Count - 1; i > 0; i--)
+      {
         range = words[i];
         int item = (int)range.Information[Word.WdInformation.wdActiveEndPageNumber];
 
-        if (item < page) {
-          range.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-          range.InsertBreak(Word.WdBreakType.wdLineBreak);
-
+        if (item < page)
+        {
+          this.SetupPageBreak(range);
           return;
         }
       }
 
-      last.Collapse(Word.WdCollapseDirection.wdCollapseEnd);
-      last.InsertBreak(Word.WdBreakType.wdPageBreak);
+      this.SetupPageBreak(last);
     }
 
-    public void FixPageBreaks() {
+    public void FixPageBreaks()
+    {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
       Word.Paragraphs paragraphs = Document.Paragraphs;
       Word.Paragraph paragraph;
@@ -106,19 +122,22 @@ namespace HyperOffice.App {
 
       int reduce = this.Document.ActiveWindow.ActivePane.Pages.Count;
 
-      for (int i = this.Document.Paragraphs.Count; i > 0; i--) {
+      for (int i = this.Document.Paragraphs.Count; i > 0; i--)
+      {
         paragraph = paragraphs[i];
         range = paragraph.Range;
         range.TextRetrievalMode.IncludeHiddenText = true;
         int pageBreakIndex = range.Text.IndexOf(this.BreakPageSymbol);
         int lineBreakIndex = range.Text.IndexOf(this.BreakLineSymbol);
 
-        if (pageBreakIndex > -1) {
+        if (pageBreakIndex > -1)
+        {
           reduce--;
           continue;
         }
 
-        if (lineBreakIndex > -1) {
+        if (lineBreakIndex > -1)
+        {
           range.SetRange(lineBreakIndex, lineBreakIndex + 1);
           range.Delete();
         }
@@ -127,14 +146,16 @@ namespace HyperOffice.App {
 
         int item = (int)range.Information[Word.WdInformation.wdActiveEndPageNumber];
 
-        if (item < reduce) {
+        if (item < reduce)
+        {
           this.MarkTransferPage(paragraph);
           reduce--;
         }
       }
     }
 
-    public void SaveAsHtml(string htmlFileName) {
+    public void SaveAsHtml(string htmlFileName)
+    {
       this.Document.WebOptions.Encoding = Office.MsoEncoding.msoEncodingUTF8;
       this.Document.WebOptions.OptimizeForBrowser = true;
       this.Document.WebOptions.OrganizeInFolder = true;
@@ -149,8 +170,8 @@ namespace HyperOffice.App {
       this.Document.SaveAs(ref fileName, ref fileFormat);
     }
 
-    public void Close() {
-
+    public void Close()
+    {
       // Сохранить измененные документы перед закрытием Word
       object SaveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
 
