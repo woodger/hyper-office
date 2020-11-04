@@ -11,19 +11,19 @@
 | Ключ | Значение | Описание |
 |------|----------|----------|
 | `env` | development | Устанавливает режим запуска приложения. Выбрать одно из потдерживаемых значений набора сред `DTAP` |
-| `address` | localhost | Для запуска приложения используется имя хоста или IP-адрес |
-| `port` | 80 | Запустит TCP-сервер, прослушивающий соединения на предоставленном хосте |
-| `page` | document.html | Имя страницы для преобразования в `html` |
+| `host` | localhost | Для запуска приложения используется имя хоста или IP-адрес |
+| `port` | 8080 | Запустит TCP-сервер, прослушивающий соединения на предоставленном хосте |
+| `page` | word.html | Имя страницы для преобразования в `html` |
 
 ### Настройка параметров запуска
 
-По умолчанию запускает приложение обрабатывает запросы на http://localhost:80.
+По умолчанию запускает приложение обрабатывает запросы на http://localhost:8080.
 Для изменения параметров запуска поправьте файл `web.config` в корне проета:
 
 ```xml
   <appSettings>
-    <add key="address" value="localhost" />
-    <add key="port" value="80" />
+    <add key="host" value="localhost" />
+    <add key="port" value="8080" />
   </appSettings>
 ```
 
@@ -46,13 +46,13 @@
 
 ### Разрешить входящие соединения (опционально)
 
-Позвольте обрабатывать входящий трафик 'Web Server' протокол `TCP` порт `80`.
+Позвольте обрабатывать входящий трафик 'Web Server' протокол `TCP` порт `8080`.
 Для этого нужно добавить правило в Брандмауэр Windows.
 
 В `PowerShell` выполните:
 
 ```shell
-New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 80
+New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 8080
 ```
 
 ## API
@@ -64,7 +64,7 @@ New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -
 Запрос с использованием интерфейса `curl`:
 
 ```bash
-curl -X POST http://localhost/api/v1/documents/convert \
+curl -X POST http://localhost/api/v1/word/convert \
   -F "file=@document.doc;type=application/msword"
 ```
 
@@ -76,8 +76,8 @@ curl -X POST http://localhost/api/v1/documents/convert \
 Возвращаемое значение: `Binary` - MIME-type `application/zip`.
 Содержимое файла:
 
-- `document.html` страница в формате `html` как указано в `web.config`.
-- `document.files` директория, содержащая перечисления ресурсов, необходимые для отображения `document.html`.
+- `word.html` страница в формате `html` как указано в `web.config`.
+- `word.files` директория, содержащая перечисления ресурсов, необходимые для отображения `word.html`.
 
 При неверном запросе вернет статус-код `400`.
 
@@ -86,7 +86,7 @@ curl -X POST http://localhost/api/v1/documents/convert \
 Запрос с использованием интерфейса `curl`:
 
 ```bash
-curl -X POST http://localhost/api/v1/documents/snapshot \
+curl -X POST http://localhost/api/v1/word/snapshot \
   -F "file=@document.doc;type=application/msword"
 ```
 

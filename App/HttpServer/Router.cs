@@ -12,8 +12,10 @@ namespace HyperOffice.App
   {
     public Router()
     {
-      this.Post("/api/v1/documents/convert", (argv) => {
+      this.Post("/api/v1/word/convert", (argv) => {
         HttpFile httpFile = this.Request.Files.FirstOrDefault();
+
+        Console.WriteLine("Post: convert");
 
         if (httpFile == null)
         {
@@ -41,7 +43,7 @@ namespace HyperOffice.App
         return this.PipeDyrectory(dirName);
       });
 
-      this.Post("/api/v1/documents/snapshot", (argv) => {
+      this.Post("/api/v1/word/snapshot", (argv) => {
         HttpFile httpFile = this.Request.Files.FirstOrDefault();
 
         if (httpFile == null)

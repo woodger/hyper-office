@@ -8,11 +8,11 @@ namespace HyperOffice
   {
     static void Main(string[] args)
     {
-      string address = ConfigurationManager.AppSettings.Get("address");
+      string host = ConfigurationManager.AppSettings.Get("host");
       string port = ConfigurationManager.AppSettings.Get("port");
 
       string origin = string.Format(@"http://{0}:{1}",
-        address,
+        host,
         port
       );
 
