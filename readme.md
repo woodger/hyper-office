@@ -64,7 +64,7 @@ New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -
 Запрос с использованием интерфейса `curl`:
 
 ```bash
-curl -X POST http://localhost/api/v1/word/convert \
+curl -X POST http://localhost/api/v1/documents/convert \
   -F "file=@document.doc;type=application/msword"
 ```
 
@@ -86,7 +86,7 @@ curl -X POST http://localhost/api/v1/word/convert \
 Запрос с использованием интерфейса `curl`:
 
 ```bash
-curl -X POST http://localhost/api/v1/word/snapshot \
+curl -X POST http://localhost/api/v1/documents/snapshot \
   -F "file=@document.doc;type=application/msword"
 ```
 
