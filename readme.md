@@ -55,6 +55,26 @@
 New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 8080
 ```
 
+### Установить зависимости
+
+В `PowerShell` выполните:
+
+```bash
+Get-Package
+```
+
+### Сборка проекта
+
+**Начало изучения**
+
+https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+
+В `PowerShell` выполните:
+
+```bash
+dotnet build
+```
+
 ## API
 
 ### Конвертировать документ в HTML
