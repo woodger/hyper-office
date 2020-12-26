@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using Word = Microsoft.Office.Interop.Word;
 
 namespace HyperOffice.App
@@ -7,13 +8,16 @@ namespace HyperOffice.App
   {
     public Word.Application Application;
 
-    public WordApplication(bool displayOn)
+    public WordApplication()
     {
-      Word.WdAlertLevel wdAlertLevel = Word.WdAlertLevel.wdAlertsMessageBox;
+      bool dev = ConfigurationManager.AppSettings.Get("env") == "development";
+
+      Word.WdAlertLevel wdAlertLevel = dev ?
+          Word.WdAlertLevel.wdAlertsMessageBox : Word.WdAlertLevel.wdAlertsNone;
 
       this.Application = new Word.Application
       {
-        Visible = displayOn,
+        Visible = dev,
         DisplayAlerts = wdAlertLevel
       };
     }

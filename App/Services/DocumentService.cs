@@ -9,13 +9,10 @@ namespace HyperOffice.App
   {
     public string SnapshotWordDocument(HttpFile httpFile)
     {
-      string env = ConfigurationManager.AppSettings.Get("env");
-      bool wordVisible = (env == "development");
-
       string documentFileName = TempUpload(httpFile);
       string dirName = CreateGuidDirectory();
 
-      WordApplication wordApplication = new WordApplication(wordVisible);
+      WordApplication wordApplication = new WordApplication();
       WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
 
       wordDocument.SnapshotPages(dirName);
@@ -25,21 +22,15 @@ namespace HyperOffice.App
       return dirName;
     }
 
-    /**
-     * Трансфорать Word-документ в HTML
-     */
-
     public string ConvertWordToHtml(HttpFile httpFile)
     {
-      string env = ConfigurationManager.AppSettings.Get("env");
       string pageBaseName = ConfigurationManager.AppSettings.Get("page");
 
       string documentFileName = TempUpload(httpFile);
       string dirName = CreateGuidDirectory();
       string pageFileName = Path.Combine(dirName, pageBaseName);
-      bool wordVisible = (env == "development");
 
-      WordApplication wordApplication = new WordApplication(wordVisible);
+      WordApplication wordApplication = new WordApplication();
       WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
 
       wordDocument.FixPageBreaks();
@@ -48,6 +39,11 @@ namespace HyperOffice.App
       wordApplication.Quit();
 
       return dirName;
+    }
+
+    public string DocumentInfo(HttpFile httpFile)
+    {
+      return "";
     }
 
     protected static string CreateGuidDirectory()
@@ -60,10 +56,6 @@ namespace HyperOffice.App
 
       return dirName;
     }
-
-    /**
-     * Сохранить файл в Temp-директорию
-     */
 
     protected static string TempUpload(HttpFile httpFile)
     {

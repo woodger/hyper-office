@@ -70,8 +70,39 @@ namespace HyperOffice.App
 
         return this.PipeDyrectory(dirName);
       });
+
+      this.Post("/api/v1/documents/info", (argv) => {
+        HttpFile httpFile = this.Request.Files.FirstOrDefault();
+
+        if (httpFile == null)
+        {
+          return 400;
+        }
+
+        string[] fileTypes = {
+          "application/msword",
+          "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        };
+
+        if (this.ValidateRequestType(fileTypes, httpFile) == false)
+        {
+          return 415;
+        }
+
+        DocumentService service = new DocumentService();
+
+        string dirName = service.DocumentInfo(httpFile);
+
+        if (dirName == null)
+        {
+          return 406;
+        }
+
+        return this.PipeDyrectory(dirName);
+      });
     }
 
+    
     private bool ValidateRequestType(string[] fileTypes, HttpFile httpFile)
     {
       return Array.Exists(fileTypes, i =>

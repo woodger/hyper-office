@@ -20,10 +20,8 @@ namespace HyperOffice
       NancyHost server = new NancyHost(uri);
       server.Start();
 
-      Console.WriteLine(
-        $"Server started on {origin}\n" +
-        "Press esc to exit the application"
-      );
+      Console.WriteLine($"Server started on {origin}");
+      Console.WriteLine("Press esc to exit the application");
 
       while (Console.ReadKey().Key != ConsoleKey.Escape) { }
     }
