@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Configuration;
+using System.Collections.Generic;
 using Nancy.Hosting.Self;
+using System.Threading;
+using CommandLine;
 
 namespace HyperOffice
 {
   class Program
   {
+    public class Options
+    {
+      [Option('d', "detached", Required = false, HelpText = "Detached mode: Run application in the background")]
+      public bool Detached { get; set; }
+    }
+
     static void Main(string[] args)
     {
       string host = ConfigurationManager.AppSettings.Get("host");
@@ -16,14 +25,29 @@ namespace HyperOffice
         port
       );
 
-      Uri uri = new Uri(origin);
-      NancyHost server = new NancyHost(uri);
+      Uri addr = new Uri(origin);
+      NancyHost server = new NancyHost(addr);
+
       server.Start();
 
-      Console.WriteLine($"Server started on {origin}");
-      Console.WriteLine("Press esc to exit the application");
+      // Under mono if you daemonize a process a Console.ReadLine will cause an EOF
+      // so we need to block another way
 
-      while (Console.ReadKey().Key != ConsoleKey.Escape) { }
+      Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
+      {
+        if (o.Detached)
+        {
+          Thread.Sleep(Timeout.Infinite);
+        }
+        else {
+          Console.WriteLine($"Server started on {origin}");
+          Console.WriteLine("Press esc to exit the application");
+
+          while (Console.ReadKey().Key != ConsoleKey.Escape) { }
+        }
+      });
+
+      server.Stop();
     }
   }
 }
