@@ -14,12 +14,23 @@ namespace HyperOffice.App.Providers
   {
     private SqliteProvider Sqlite = new SqliteProvider("Sqlite");
     private List<Task> TokentRing;
-    private int Threds;
+    private int Threads;
 
-    public QueueProvider(int threds = 1)
+    public QueueProvider(int threads = 1)
     {
-      this.TokentRing = new List<Task>(threds);
-      this.Threds = threds;
+      var cores = Environment.ProcessorCount;
+
+      if (threads < 1 || threads > cores)
+      {
+        var errorMessage = string.Format(@"Number of worker threads exceeded (1, {0})",
+          cores
+        );
+
+        throw new Exception(errorMessage);
+      }
+
+      this.TokentRing = new List<Task>(threads);
+      this.Threads = threads;
 
       this.Sqlite.Execute(
         @"CREATE TABLE IF NOT EXISTS `queue` (" +
@@ -59,9 +70,11 @@ namespace HyperOffice.App.Providers
           arguments = cursor.GetString(1)
         };
 
-        if (this.TokentRing.Contains(task) == false && this.TokentRing.Count < this.Threds) {
-          this.TokentRing.Add(task);
-          this.Execute(task);
+        if (this.TokentRing.Contains(task) == false && this.TokentRing.Count < this.Threads) {
+          if (this.Execute(task))
+          {
+            this.TokentRing.Add(task);
+          }
         }
       }
     }
@@ -70,15 +83,15 @@ namespace HyperOffice.App.Providers
     {
       var proc = new Process();
 
-      proc.Exited += (object sender, System.EventArgs e) => {
-        this.ProcExited(task);
-      };
-
       proc.StartInfo.FileName = task.programm;
       proc.StartInfo.Arguments = task.arguments;
       proc.StartInfo.UseShellExecute = false;
       proc.StartInfo.CreateNoWindow = true;
       proc.EnableRaisingEvents = true;
+
+      proc.Exited += (object sender, System.EventArgs e) => {
+        this.ProcExited(task);
+      };
 
       return proc.Start();
     }

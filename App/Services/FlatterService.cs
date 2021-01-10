@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using HyperOffice.App.Providers;
 using Nancy;
 
-namespace HyperOffice.App
+namespace HyperOffice.App.Services
 {
-  class DocumentService000
+  class FlatterService
   {
     public string SnapshotWordDocument(HttpFile httpFile)
     {
       string documentFileName = TempUpload(httpFile);
       string dirName = CreateGuidDirectory();
 
-      WordApplication wordApplication = new WordApplication();
-      WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
+      var wordApplication = new WordApplication();
+      var wordDocument = wordApplication.OpenDocument(documentFileName);
 
       wordDocument.SnapshotPages(dirName);
       wordDocument.Close();
@@ -30,8 +31,8 @@ namespace HyperOffice.App
       string dirName = CreateGuidDirectory();
       string pageFileName = Path.Combine(dirName, pageBaseName);
 
-      WordApplication wordApplication = new WordApplication();
-      WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
+      var wordApplication = new WordApplication();
+      var wordDocument = wordApplication.OpenDocument(documentFileName);
 
       wordDocument.FixPageBreaks();
       wordDocument.SaveAsHtml(pageFileName);
@@ -39,11 +40,6 @@ namespace HyperOffice.App
       wordApplication.Quit();
 
       return dirName;
-    }
-
-    public string DocumentInfo(HttpFile httpFile)
-    {
-      return "";
     }
 
     protected static string CreateGuidDirectory()

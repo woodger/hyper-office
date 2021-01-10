@@ -1,33 +1,27 @@
 ﻿using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HyperOffice.App.Providers
 {
   class SqliteProvider
   {
-    SqliteConnection connection;
+    private SqliteConnection Connection;
 
     public SqliteProvider(string databaseName)
     {
-      var param = string.Format(@"Data Source={0}.db",
+      var options = string.Format(@"Data Source={0}.db",
         databaseName
       );
 
-      this.connection = new SqliteConnection(param);
-      this.connection.Open();
+      this.Connection = new SqliteConnection(options);
+      this.Connection.Open();
     }
 
-    public SqliteDataReader Execute(string sql, object values = null)
+    public SqliteDataReader Execute(string expression, object values = null)
     {
-      var cmd = this.connection.CreateCommand();
+      var cmd = this.Connection.CreateCommand();
 
       cmd.CommandText = string.Format(@"{0}",
-        sql
+        expression
       );
 
       if (values != null)
@@ -44,17 +38,6 @@ namespace HyperOffice.App.Providers
       }
 
       return cmd.ExecuteReader();
-  
-      /*
-      using (var exec = cmd.ExecuteReader())
-      {
-        while (exec.Read())
-        {
-          var value = exec.GetString(0);
-          Console.WriteLine(value);
-        }
-      }
-      */
     }
   }
 }

@@ -5,7 +5,7 @@ using Word = Microsoft.Office.Interop.Word;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace HyperOffice.App
+namespace HyperOffice.App.Providers
 {
   class WordDocument
   {
@@ -22,28 +22,28 @@ namespace HyperOffice.App
     {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
 
-      Word.Range range = this.Document.Range();
-      Word.PageSetup setup = range.PageSetup;
+      var range = this.Document.Range();
+      var setup = range.PageSetup;
 
-      object size = new {
+      var size = new {
         width = setup.PageWidth,
         height = setup.PageHeight
       };
 
-      object margin = new {
+      var margin = new {
         top = setup.TopMargin,
         right = setup.RightMargin,
         bottom = setup.BottomMargin,
         left = setup.LeftMargin
       };
 
-      Word.Pages pages = this.Document.ActiveWindow.ActivePane.Pages;
+      var pages = this.Document.ActiveWindow.ActivePane.Pages;
       int count = pages.Count;
       object[] dimensions = new object[count];
 
       for (int i = 1; i <= count; i++)
       {
-        Word.Page page = pages[i];
+        var page = pages[i];
 
         dimensions[(i - 1)] = new {
           width = page.Width,
@@ -63,20 +63,20 @@ namespace HyperOffice.App
     public void SnapshotPages(string dirName)
     {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
-      Word.Pages pages = this.Document.ActiveWindow.ActivePane.Pages;
 
-      int index = 0;
+      var pages = this.Document.ActiveWindow.ActivePane.Pages;
+      int number = 0;
 
-      foreach (Word.Page page in pages)
+      foreach (Word.Page item in pages)
       {
-        index++;
-        dynamic bytes = page.EnhMetaFileBits;
-        MemoryStream stream = new MemoryStream(bytes);
+        MemoryStream stream = new MemoryStream(item.EnhMetaFileBits);
+
+        number++;
 
         string fileName = string.Format(@"{0}{1}{2}.png",
           Path.GetFullPath(dirName),
           Path.DirectorySeparatorChar,
-          index.ToString()
+          number.ToString()
         );
 
         Image.FromStream(stream).Save(fileName, ImageFormat.Png);
@@ -92,15 +92,13 @@ namespace HyperOffice.App
     private void MarkTransferPage(Word.Paragraph paragraph)
     {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
-      Word.Range range = paragraph.Range;
-      Word.Words words = range.Words;
-      Word.Range last = words.Last;
 
-      int page = (int)last.Information[Word.WdInformation.wdActiveEndPageNumber];
+      var range = paragraph.Range;
+      int page = (int)range.Words.Last.Information[Word.WdInformation.wdActiveEndPageNumber];
 
-      for (int i = words.Count - 1; i > 0; i--)
+      for (int i = range.Words.Count - 1; i > 0; i--)
       {
-        range = words[i];
+        range = range.Words[i];
         int item = (int)range.Information[Word.WdInformation.wdActiveEndPageNumber];
 
         if (item < page)
@@ -110,13 +108,14 @@ namespace HyperOffice.App
         }
       }
 
-      this.SetupPageBreak(last);
+      this.SetupPageBreak(range.Words.Last);
     }
 
     public void FixPageBreaks()
     {
       this.Document.ActiveWindow.View.Type = Word.WdViewType.wdPrintView;
-      Word.Paragraphs paragraphs = Document.Paragraphs;
+
+      var paragraphs = Document.Paragraphs;
       Word.Paragraph paragraph;
       Word.Range range;
 
@@ -127,6 +126,7 @@ namespace HyperOffice.App
         paragraph = paragraphs[i];
         range = paragraph.Range;
         range.TextRetrievalMode.IncludeHiddenText = true;
+
         int pageBreakIndex = range.Text.IndexOf(this.BreakPageSymbol);
         int lineBreakIndex = range.Text.IndexOf(this.BreakLineSymbol);
 
@@ -161,8 +161,7 @@ namespace HyperOffice.App
       this.Document.WebOptions.OrganizeInFolder = true;
       this.Document.WebOptions.UseLongFileNames = true;
       this.Document.WebOptions.AllowPNG = true;
-      //this.Document.WebOptions.ScreenSize = Office.MsoScreenSize.msoScreenSize1152x900;
-      this.Document.WebOptions.PixelsPerInch = 96; // 72, 96, 120
+      this.Document.WebOptions.PixelsPerInch = 96;
 
       object fileFormat = Word.WdSaveFormat.wdFormatFilteredHTML;
       object fileName = htmlFileName;
@@ -172,13 +171,8 @@ namespace HyperOffice.App
 
     public void Close()
     {
-      // Сохранить измененные документы перед закрытием Word
       object SaveChanges = Word.WdSaveOptions.wdDoNotSaveChanges;
-
-      // Задает формат сохранения для документа
       object OriginalFormat = Word.WdOriginalFormat.wdOriginalDocumentFormat;
-
-      // Отправить документ к следующему получателю (не учитывается)
       object RouteDocument = true;
 
       this.Document.Close(ref SaveChanges, ref OriginalFormat, ref RouteDocument);

@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Configuration;
 using Word = Microsoft.Office.Interop.Word;
 
-namespace HyperOffice.App
+namespace HyperOffice.App.Providers
 {
   class WordApplication
   {
-    public Word.Application Application;
+    private Word.Application Application;
 
     public WordApplication()
     {
-      /*
-      bool dev = ConfigurationManager.AppSettings.Get("env") == "development";
-
-      Word.WdAlertLevel wdAlertLevel = dev ?
-          Word.WdAlertLevel.wdAlertsMessageBox : Word.WdAlertLevel.wdAlertsNone;
-      */
-
       Word.WdAlertLevel wdAlertLevel = Word.WdAlertLevel.wdAlertsMessageBox;
 
       this.Application = new Word.Application
@@ -28,13 +20,8 @@ namespace HyperOffice.App
 
     public WordDocument OpenDocument(object FileName)
     {
-      // Открыть диалоговое окно Преобразование файла, если файл не находится в формате Microsoft Word
       object ConfirmConversions = false;
-
-      // Открыть документ только для чтения
       object ReadOnly = false;
-
-      // Добавить имя файла в список недавно использованных файлов
       object AddToRecentFiles = false;
 
       Word.Document document = this.Application.Documents.Open(

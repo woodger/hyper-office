@@ -1,16 +1,12 @@
-﻿using Nancy;
-using Nancy.Responses;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Nancy;
+using Nancy.Responses;
 
-namespace HyperOffice.App.HttpServer
+namespace HyperOffice.App.Toolkit
 {
-  class Toolkit
+  class HttpRequest
   {
     public static bool ValidateRequestType(HttpFile httpFile, string[] fileTypes)
     {
@@ -19,7 +15,7 @@ namespace HyperOffice.App.HttpServer
       );
     }
 
-    public static StreamResponse PipeDyrectory(string dirName)
+    public static StreamResponse PackFolderIntoZipStream(string dirName)
     {
       var tempPath = Path.GetTempPath();
       var guidPath = Guid.NewGuid().ToString();

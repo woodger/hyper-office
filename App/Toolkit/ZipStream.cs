@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace HyperOffice.App.HttpServer
+namespace HyperOffice.App.Toolkit
 {
   internal class ZipStream : FileStream
   {

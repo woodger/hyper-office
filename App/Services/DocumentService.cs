@@ -1,13 +1,13 @@
-﻿using HyperOffice.App.Providers;
-using Nancy;
-using System;
+﻿using System;
 using System.IO;
+using Nancy;
+using HyperOffice.App.Providers;
 
 namespace HyperOffice.App.Services
 {
   class DocumentService
   {
-    QueueProvider Queue;
+    private QueueProvider Queue;
 
     public DocumentService(QueueProvider queue)
     {

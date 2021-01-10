@@ -2,9 +2,8 @@
 using Nancy.Hosting.Self;
 using System.Threading;
 using CommandLine;
-using HyperOffice.App;
-using System.IO;
 using HyperOffice.App.Providers;
+using HyperOffice.App.Actions;
 
 /**
  * https://github.com/commandlineparser/commandline
@@ -41,6 +40,13 @@ namespace HyperOffice
         HelpText = "Port of listen server"
       )]
       public int Port { get; set; }
+
+      [Option('t', "threads",
+        Required = false,
+        Default = 1,
+        HelpText = "Numbers worker threads of Queue"
+      )]
+      public int Threads { get; set; }
     }
 
     [Verb("snapshot",
@@ -74,6 +80,8 @@ namespace HyperOffice
         throw new Exception("Expected User Ports (1024-49151)");
       }
 
+      State.Queue = new QueueProvider(opts.Threads);
+
       var origin = string.Format(@"http://localhost:{0}",
         opts.Port
       );
@@ -82,7 +90,6 @@ namespace HyperOffice
       var server = new NancyHost(listen);
 
       server.Start();
-      Router.UpContext();
 
       if (opts.Detached)
       {
@@ -105,9 +112,7 @@ namespace HyperOffice
     static void Snapshot(SnapshotOptions opts)
     {
       var hyperDocument = new HyperDocument();
-
       hyperDocument.Snapshot(opts.Input, opts.Host);
-      File.Delete(opts.Input);
     }
   }
 }
