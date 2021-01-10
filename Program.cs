@@ -1,53 +1,113 @@
 ﻿using System;
-using System.Configuration;
-using System.Collections.Generic;
 using Nancy.Hosting.Self;
 using System.Threading;
 using CommandLine;
+using HyperOffice.App;
+using System.IO;
+using HyperOffice.App.Providers;
+
+/**
+ * https://github.com/commandlineparser/commandline
+ * 
+ * Show more options:
+ *    HyperOffice.exe --help
+ */
 
 namespace HyperOffice
 {
   class Program
   {
-    public class Options
+    [Verb("up",
+      isDefault: true,
+      HelpText = "Start the Http Server"
+    )]
+    class UpOptions
     {
-      [Option('d', "detached", Required = false, HelpText = "Detached mode: Run application in the background")]
+      [Option('d',
+        Required = false,
+        HelpText = "Detached mode: Run application in the background"
+      )]
       public bool Detached { get; set; }
+
+      [Option('q', "quiet",
+        Required = false,
+        HelpText = "Quiet mode"
+      )]
+      public bool Quiet { get; set; }
+
+      [Option('p', "port",
+        Required = false,
+        Default = 8080,
+        HelpText = "Port of listen server"
+      )]
+      public int Port { get; set; }
+    }
+
+    [Verb("snapshot",
+      HelpText = "Make Screenshot in Microsoft Word"
+    )]
+    class SnapshotOptions
+    {
+      [Option("input",
+        HelpText = "Microsoft Word document file"
+      )]
+      public string Input { get; set; }
+
+      [Option("host",
+        Required = false,
+        HelpText = "Endpoint for return result"
+      )]
+      public string Host { get; set; }
     }
 
     static void Main(string[] args)
     {
-      string host = ConfigurationManager.AppSettings.Get("host");
-      string port = ConfigurationManager.AppSettings.Get("port");
+      Parser.Default.ParseArguments<UpOptions, SnapshotOptions>(args)
+        .WithParsed<UpOptions>(opts => HttpServer(opts))
+        .WithParsed<SnapshotOptions>(opts => Snapshot(opts));
+    }
 
-      string origin = string.Format(@"http://{0}:{1}",
-        host,
-        port
+    static void HttpServer(UpOptions opts)
+    {
+      if (opts.Port < 1024 || opts.Port > 49151)
+      {
+        throw new Exception("Expected User Ports (1024-49151)");
+      }
+
+      var origin = string.Format(@"http://localhost:{0}",
+        opts.Port
       );
 
-      Uri addr = new Uri(origin);
-      NancyHost server = new NancyHost(addr);
+      var listen = new Uri(origin);
+      var server = new NancyHost(listen);
 
       server.Start();
+      Router.UpContext();
 
-      // Under mono if you daemonize a process a Console.ReadLine will cause an EOF
-      // so we need to block another way
-
-      Parser.Default.ParseArguments<Options>(args).WithParsed<Options>(o =>
+      if (opts.Detached)
       {
-        if (o.Detached)
-        {
-          Thread.Sleep(Timeout.Infinite);
-        }
-        else {
-          Console.WriteLine($"Server started on {origin}");
-          Console.WriteLine("Press esc to exit the application");
+        Thread.Sleep(Timeout.Infinite);
+      }
+      else
+      {
+        Console.WriteLine(@"Server started on {0}",
+          origin
+        );
 
-          while (Console.ReadKey().Key != ConsoleKey.Escape) { }
-        }
-      });
+        Console.WriteLine("Press esc to exit the application");
+
+        while (Console.ReadKey().Key != ConsoleKey.Escape) { }
+      }
 
       server.Stop();
+    }
+
+    static void Snapshot(SnapshotOptions opts)
+    {
+      var hyperDocument = new HyperDocument();
+
+      hyperDocument.Snapshot(opts.Input, opts.Host);
+      File.Delete(opts.Input);
     }
   }
 }

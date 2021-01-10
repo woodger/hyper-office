@@ -1,19 +1,31 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using HyperOffice.App.HttpServer;
 using HyperOffice.App.Providers;
+using HyperOffice.App.Services;
 using Nancy;
 
 namespace HyperOffice.App
 {
+  struct State
+  {
+    public static QueueProvider Queue = new QueueProvider(2);
+  }
+
   public class Router : NancyModule
   {
+    public static void UpContext() {
+      State.Queue.Notificate();
+    }
+
     public Router()
     {
       Post("/api/v1/documents/snapshot", (argv) =>
       {
-        HttpFile httpFile = this.Request.Files.FirstOrDefault();
+        var httpFile = this.Request.Files.FirstOrDefault();
+        var callBack = this.Request.Form["callback"];
 
-        if (httpFile == null)
+        if (httpFile == null || callBack == null)
         {
           return 400;
         }
@@ -23,31 +35,15 @@ namespace HyperOffice.App
           "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         };
 
-        if (Toolkit.ValidateRequestType(fileTypes, httpFile) == false)
+        if (Toolkit.ValidateRequestType(httpFile, fileTypes) == false)
         {
           return 415;
         }
 
-        /*
-        bool res = Queue.Publish();
-
-        if (res == false) {
-          return 500;
-        }
-        */
+        var documentService = new DocumentService(State.Queue);
+        documentService.Snapshot(httpFile, callBack);
 
         return 202;
-
-        /*        DocumentService service = new DocumentService();
-
-                string dirName = service.SnapshotWordDocument(httpFile);
-
-                if (dirName == null)
-                {
-                  return 406;
-                }
-
-                return Toolkit.PipeDyrectory(dirName);*/
       });
 
       /*

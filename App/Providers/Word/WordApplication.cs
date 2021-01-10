@@ -10,14 +10,18 @@ namespace HyperOffice.App
 
     public WordApplication()
     {
+      /*
       bool dev = ConfigurationManager.AppSettings.Get("env") == "development";
 
       Word.WdAlertLevel wdAlertLevel = dev ?
           Word.WdAlertLevel.wdAlertsMessageBox : Word.WdAlertLevel.wdAlertsNone;
+      */
+
+      Word.WdAlertLevel wdAlertLevel = Word.WdAlertLevel.wdAlertsMessageBox;
 
       this.Application = new Word.Application
       {
-        Visible = dev,
+        Visible = true,
         DisplayAlerts = wdAlertLevel
       };
     }

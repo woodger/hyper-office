@@ -12,26 +12,29 @@ namespace HyperOffice.App.HttpServer
 {
   class Toolkit
   {
-    public static bool ValidateRequestType(string[] fileTypes, HttpFile httpFile)
+    public static bool ValidateRequestType(HttpFile httpFile, string[] fileTypes)
     {
-      return Array.Exists(fileTypes, i =>
-        i == httpFile.ContentType
+      return Array.Exists(fileTypes, (item) =>
+        item == httpFile.ContentType
       );
     }
 
     public static StreamResponse PipeDyrectory(string dirName)
     {
-      string tempPath = Path.GetTempPath();
-      string guidPath = Guid.NewGuid().ToString();
+      var tempPath = Path.GetTempPath();
+      var guidPath = Guid.NewGuid().ToString();
 
-      string baseName = string.Format(@"{0}.zip", guidPath);
-      string zipFileName = Path.Combine(tempPath, baseName);
+      var baseName = string.Format(@"{0}.zip",
+        guidPath
+      );
+
+      var zipFileName = Path.Combine(tempPath, baseName);
 
       ZipFile.CreateFromDirectory(dirName, zipFileName);
       Directory.Delete(dirName, true);
 
-      ZipStream stream = new ZipStream(zipFileName, FileMode.Open);
-      string contentType = MimeTypes.GetMimeType(zipFileName);
+      var stream = new ZipStream(zipFileName, FileMode.Open);
+      var contentType = MimeTypes.GetMimeType(zipFileName);
 
       return new StreamResponse(
         () => stream,

@@ -1,81 +1,67 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
+﻿using HyperOffice.App.Providers;
 using Nancy;
+using System;
+using System.IO;
 
-namespace HyperOffice.App
+namespace HyperOffice.App.Services
 {
   class DocumentService
   {
-    public string SnapshotWordDocument(HttpFile httpFile)
+    QueueProvider Queue;
+
+    public DocumentService(QueueProvider queue)
     {
-      string documentFileName = TempUpload(httpFile);
-      string dirName = CreateGuidDirectory();
-
-      WordApplication wordApplication = new WordApplication();
-      WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
-
-      wordDocument.SnapshotPages(dirName);
-      wordDocument.Close();
-      wordApplication.Quit();
-
-      return dirName;
+      this.Queue = queue;
     }
 
-    public string ConvertWordToHtml(HttpFile httpFile)
+    public void Snapshot(HttpFile httpFile, string callBack)
     {
-      string pageBaseName = ConfigurationManager.AppSettings.Get("page");
+      var storePath = this.GetStoragePath("documents");
 
-      string documentFileName = TempUpload(httpFile);
-      string dirName = CreateGuidDirectory();
-      string pageFileName = Path.Combine(dirName, pageBaseName);
+      Directory.CreateDirectory(storePath);
 
-      WordApplication wordApplication = new WordApplication();
-      WordDocument wordDocument = wordApplication.OpenDocument(documentFileName);
+      var fileName = this.FileUpload(storePath, httpFile);
+      var programm = System.AppDomain.CurrentDomain.FriendlyName;
 
-      wordDocument.FixPageBreaks();
-      wordDocument.SaveAsHtml(pageFileName);
-      wordDocument.Close();
-      wordApplication.Quit();
+      var arguments = string.Format(@"snapshot --input={0} --host={1}",
+        fileName,
+        callBack
+      );
 
-      return dirName;
+      this.Queue.Publish(programm, arguments);
     }
 
-    public string DocumentInfo(HttpFile httpFile)
+    public string GetStoragePath(string ctxPath = "")
     {
-      return "";
+      var localData = Environment.SpecialFolder.LocalApplicationData;
+      var localPath = Environment.GetFolderPath(localData);
+      var progName = System.AppDomain.CurrentDomain.FriendlyName;
+      var dotIndex = progName.LastIndexOf('.');
+      
+      var appPath = dotIndex > -1 ?
+        progName.Substring(0, dotIndex) : progName;
+
+      return Path.Combine(localPath, appPath, ctxPath);
     }
 
-    protected static string CreateGuidDirectory()
+    protected string FileUpload(string destPath, HttpFile httpFile)
     {
-      string tempPath = Path.GetTempPath();
-      string guidPath = Guid.NewGuid().ToString();
-      string dirName = Path.Combine(tempPath, guidPath);
+      var guidPath = Guid.NewGuid().ToString();
+      var extension = Path.GetExtension(httpFile.Name);
 
-      Directory.CreateDirectory(dirName);
-
-      return dirName;
-    }
-
-    protected static string TempUpload(HttpFile httpFile)
-    {
-      string tempPath = Path.GetTempPath();
-      string guidPath = Guid.NewGuid().ToString();
-      string extension = Path.GetExtension(httpFile.Name);
-
-      string baseName = string.Format(@"{0}{1}",
+      var baseName = string.Format(@"{0}{1}",
         guidPath,
         extension
       );
+      
+      var fileName = Path.Combine(destPath, baseName);
 
-      string documentFileName = Path.Combine(tempPath, baseName);
-
-      using (var fileStream = File.OpenWrite(documentFileName))
+      using (var fileStream = File.OpenWrite(fileName))
       {
         httpFile.Value.CopyTo(fileStream);
       }
 
-      return documentFileName;
+      return fileName;
     }
   }
 }
