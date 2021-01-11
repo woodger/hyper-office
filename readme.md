@@ -56,7 +56,7 @@ Options:
   -d               Detached mode. Run application in the background
   -q, --quiet      Quiet mode
   -p, --port       (Default: 8080) Port of listen server
-  -t, --threads    (Default: 1)Numbers worker threads of Queue. Limited by the number of CPU cores
+  -t, --threads    (Default: 1) Numbers worker threads of Queue. Limited by the number of CPU cores
   --help           Display more information on a specific command
   --version        Display version information
 ```

@@ -54,16 +54,17 @@ namespace HyperOffice
     )]
     class SnapshotOptions
     {
+
+      [Option("url",
+        Required = false,
+        HelpText = "Url for return result"
+      )]
+      public string Url { get; set; }
+
       [Option("input",
         HelpText = "Microsoft Word document file"
       )]
       public string Input { get; set; }
-
-      [Option("host",
-        Required = false,
-        HelpText = "Endpoint for return result"
-      )]
-      public string Host { get; set; }
     }
 
     static void Main(string[] args)
@@ -112,7 +113,7 @@ namespace HyperOffice
     static void Snapshot(SnapshotOptions opts)
     {
       var hyperDocument = new HyperDocument();
-      hyperDocument.Snapshot(opts.Input, opts.Host);
+      hyperDocument.Snapshot(opts.Url, opts.Input);
     }
   }
 }
