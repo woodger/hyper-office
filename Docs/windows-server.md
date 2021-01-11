@@ -1,11 +1,6 @@
-## Настройки Windows
+## Configuration Windows Server
 
-Внешние источники:
-
-- Установка и настройка сервера Windows Server 2016
-https://www.youtube.com/watch?v=1OGw6JybjXM
-
-### Диспетчер серверов
+### Server manager
 
 #### 1. Отключить усиленную безопасность Internet Explorer
 
