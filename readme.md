@@ -1,97 +1,71 @@
 # Hyper Office
 
-###### [Настройка Windows](docs/windows.md)
+[![License](https://img.shields.io/npm/l/express.svg)](https://github.com/woodger/hyper-office/blob/master/LICENSE)
 
-Разработано на языке `C#` на платформе .NET Framework 4.7 с использованием фреймворка `Nancy 2.0`.
+Microsoft Office service hypervisor.
 
-## Руководство по началу работ
+![yuml diagram](https://yuml.me/woodger/diagram/scruffy;dir:LR/class/[Document{bg:lightsteelblue}]->parse[Hypervisor],[Hypervisor]->publish[Queue{bg:yellow}],[Queue]->[SqliteDB],[Queue]<>-.->thread[Task{bg:yellowgreen}],[Task]->process[Hypervisor])
 
-Для изменения параметров запуска поправьте директиву `<appSettings>` `web.config` в корне проета:
+###### [Windows Server](Docs/windows-server.md)
 
-| Ключ | Значение | Описание |
-|------|----------|----------|
-| `env` | development | Устанавливает режим запуска приложения. Выбрать одно из потдерживаемых значений набора сред `DTAP` |
-| `address` | localhost | Для запуска приложения используется имя хоста или IP-адрес |
-| `port` | 80 | Запустит TCP-сервер, прослушивающий соединения на предоставленном хосте |
-| `page` | document.html | Имя страницы для преобразования в `html` |
+This solution implemented in `C#` language on the .NET Framework 4.7 using the `Nancy 2.0` framework.
 
-### Настройка параметров запуска
+## Getting Started
 
-По умолчанию запускает приложение обрабатывает запросы на http://localhost:80.
-Для изменения параметров запуска поправьте файл `web.config` в корне проета:
+Clone this project
 
-```xml
-  <appSettings>
-    <add key="address" value="localhost" />
-    <add key="port" value="80" />
-  </appSettings>
+```sh
+git clone https://github.com/woodger/hyper-office
 ```
 
-#### Переменные окружения
+### Install dependencies
 
-Набор сред, используемых для `DTAP`:
+Run `PowerShell` and type:
 
-- [x] development
-- [ ] testing
-- [ ] acceptance
-- [x] production
-
-Задать требуемую переменную среды:
-
-```xml
-  <appSettings>
-    <add key="env" value="development" />
-  </appSettings>
+```sh
+Get-Package
 ```
 
-### Разрешить входящие соединения (опционально)
+### Build .NET
 
-Позвольте обрабатывать входящий трафик 'Web Server' протокол `TCP` порт `80`.
-Для этого нужно добавить правило в Брандмауэр Windows.
+More guide (.NET Core CLI dotnet build)[https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-build]
 
-В `PowerShell` выполните:
-
-```shell
-New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 80
+```sh
+dotnet build
 ```
 
-## API
+### Allow incomming conection (optional)
 
-### Конвертировать документ в HTML
+Allow to process incoming traffic 'Web Server' protocol 'TCP' port '8080'. To do this, add a rule to Windows Firewall.
 
-Преобразует файл с расширением `.doc` и `.docx` в веб-страницу.
+```sh
+New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 8080
+```
 
-Запрос с использованием интерфейса `curl`:
+## API docs
+
+### Get snapshots of document pages
+
+Complite request. Some time later, after about 1 minute. When ready, `binary` - MIME-type `application/zip` file content will be passed to the specified `callback`. The `zip` file will contain a list of pages by numbers with the `.png` extension.
+
+Request using the `curl` interface:
 
 ```bash
-curl -X POST http://localhost/api/v1/documents/convert \
-  -F "file=@document.doc;type=application/msword"
+curl -X POST http://example.com/api/v1/documents/snapshot \
+  -F "file=@document.doc;type=application/msword" \
+  -F "callback=http://example.com/callback"
 ```
 
-Обязательный параметр `type`, один из:
+Return the Status Code:
 
-- application/msword
-- application/vnd.openxmlformats-officedocument.wordprocessingml.document
+- `202 Accepted` success
+- `400 Bad Request` if an undefined or empty parameter is passed in `FormData`
+- `415 Unsupported Media Type` if MIME type input file is not `application/msword`
 
-Возвращаемое значение: `Binary` - MIME-type `application/zip`.
-Содержимое файла:
+## External dependencies
 
-- `document.html` страница в формате `html` как указано в `web.config`.
-- `document.files` директория, содержащая перечисления ресурсов, необходимые для отображения `document.html`.
+### Microsoft Office
 
-При неверном запросе вернет статус-код `400`.
+Office, is a family of client software, server software, and services developed by Microsoft. Primarily used Microsoft Word and Microsoft Excel.
 
-### Получить снимки страниц документа
-
-Запрос с использованием интерфейса `curl`:
-
-```bash
-curl -X POST http://localhost/api/v1/documents/snapshot \
-  -F "file=@document.doc;type=application/msword"
-```
-
-Возвращаемое значение: `Binary` - MIME-type `application/zip`.
-Содержимое возвращаемого файла `zip` состоит из списка изображений в формате `.png`.
-Имя файла изображения соответствует номерам страниц.
-
-В случае неверного запроса вернет статус-код `400`.
+Download `Office` exe-file from official site https://setup.office.com/
