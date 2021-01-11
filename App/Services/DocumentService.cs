@@ -23,9 +23,9 @@ namespace HyperOffice.App.Services
       var fileName = this.FileUpload(storePath, httpFile);
       var programm = System.AppDomain.CurrentDomain.FriendlyName;
 
-      var arguments = string.Format(@"snapshot --input={0} --host={1}",
-        fileName,
-        callBack
+      var arguments = string.Format(@"snapshot --url={0} --input={1}",
+        callBack,
+        fileName
       );
 
       this.Queue.Publish(programm, arguments);
