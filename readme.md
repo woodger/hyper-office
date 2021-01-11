@@ -2,7 +2,9 @@
 
 [![License](https://img.shields.io/npm/l/express.svg)](https://github.com/woodger/hyper-office/blob/master/LICENSE)
 
-Microsoft Office service hypervisor
+Microsoft Office service hypervisor.
+
+![yuml diagram](https://yuml.me/woodger/diagram/scruffy;dir:LR/class/[Document{bg:lightsteelblue}]->parse[Hypervisor],[Hypervisor]->publish[Queue{bg:yellow}],[Queue]->[SqliteDB],[Queue]<>-.->thread[Task{bg:yellowgreen}],[Task]->process[Hypervisor])
 
 ###### [Windows Server](Docs/windows-server.md)
 
