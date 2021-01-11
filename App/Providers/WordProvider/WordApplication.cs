@@ -9,13 +9,11 @@ namespace HyperOffice.App.Providers
 
     public WordApplication()
     {
-      Word.WdAlertLevel wdAlertLevel = Word.WdAlertLevel.wdAlertsMessageBox;
-
       this.Application = new Word.Application
       {
         Visible = true,
-        DisplayAlerts = wdAlertLevel
-      };
+        DisplayAlerts = Word.WdAlertLevel.wdAlertsNone
+    };
     }
 
     public WordDocument OpenDocument(object FileName)
