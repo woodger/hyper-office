@@ -6,7 +6,7 @@ Microsoft Office service hypervisor.
 
 ![yuml diagram](https://yuml.me/woodger/diagram/scruffy;dir:LR/class/[Document{bg:lightsteelblue}]->parse[Hypervisor],[Hypervisor]->publish[Queue{bg:yellow}],[Queue]->[SqliteDB],[Queue]<>-.->thread[Task{bg:yellowgreen}],[Task]->process[Hypervisor])
 
-###### [Windows Server](Docs/windows-server.md)
+###### [Windows Server](Docs/api.md) | [Windows Server](Docs/windows-server.md)
 
 This solution implemented in `C#` language on the .NET Framework 4.7 using the `Nancy 2.0` framework.
 
@@ -42,25 +42,24 @@ Allow to process incoming traffic 'Web Server' protocol 'TCP' port '8080'. To do
 New-NetFirewallRule -DisplayName 'Web Server' -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 8080
 ```
 
-## API docs
+### Usage CLI
 
-### Get snapshots of document pages
-
-Complite request. Some time later, after about 1 minute. When ready, `binary` - MIME-type `application/zip` file content will be passed to the specified `callback`. The `zip` file will contain a list of pages by numbers with the `.png` extension.
-
-Request using the `curl` interface:
-
-```bash
-curl -X POST http://example.com/api/v1/documents/snapshot \
-  -F "file=@document.doc;type=application/msword" \
-  -F "callback=http://example.com/callback"
 ```
+Usage:
+  HyperOffice.exe [COMMAND = up] [OPTIONS]
 
-Return the Status Code:
+Commands:
+  up               Start the Http server
+  snapshot         Make screenshot in Office document
 
-- `202 Accepted` success
-- `400 Bad Request` if an undefined or empty parameter is passed in `FormData`
-- `415 Unsupported Media Type` if MIME type input file is not `application/msword`
+Options:
+  -d               Detached mode. Run application in the background
+  -q, --quiet      Quiet mode
+  -p, --port       (Default: 8080) Port of listen server
+  -t, --threads    (Default: 1)Numbers worker threads of Queue. Limited by the number of CPU cores
+  --help           Display more information on a specific command
+  --version        Display version information
+```
 
 ## External dependencies
 
