@@ -18,13 +18,13 @@ namespace HyperOffice
   {
     [Verb("up",
       isDefault: true,
-      HelpText = "Start the Http Server"
+      HelpText = "Start the Http server"
     )]
     class UpOptions
     {
       [Option('d',
         Required = false,
-        HelpText = "Detached mode: Run application in the background"
+        HelpText = "Detached mode. Run application in the background"
       )]
       public bool Detached { get; set; }
 
@@ -44,13 +44,13 @@ namespace HyperOffice
       [Option('t', "threads",
         Required = false,
         Default = 1,
-        HelpText = "Numbers worker threads of Queue"
+        HelpText = "Numbers worker threads of Queue. Limited by the number of CPU cores"
       )]
       public int Threads { get; set; }
     }
 
     [Verb("snapshot",
-      HelpText = "Make Screenshot in Microsoft Word"
+      HelpText = "Make screenshot in Office document"
     )]
     class SnapshotOptions
     {
