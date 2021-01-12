@@ -17,16 +17,14 @@ namespace HyperOffice.App.Actions
       wordDocument.Close();
       wordApplication.Quit();
 
-      var res = SendResponse(url, buildPath);
-
-      if (res.IsSuccessful)
+      if (SendResponse(url, buildPath))
       {
         Directory.Delete(buildPath, true);
         File.Delete(fileName);
       }
     }
 
-    private IRestResponse SendResponse(string url, string dirName)
+    private bool SendResponse(string url, string dirName)
     {
       var client = new RestClient(url);
       var req = new RestRequest();
@@ -37,7 +35,7 @@ namespace HyperOffice.App.Actions
         req.AddFile(fileName, item);
       }
 
-      return client.Post(req);
+      return client.Post(req).IsSuccessful;
     }
 
     private string CreateTempDirectory()
