@@ -38,6 +38,8 @@ namespace HyperOffice.App.Providers
           "`arguments` text" +
         ")"
       );
+
+      this.Notificate();
     }
 
     public void Publish(string programm, string arguments = "")
@@ -88,7 +90,7 @@ namespace HyperOffice.App.Providers
       proc.StartInfo.UseShellExecute = false;
       proc.StartInfo.CreateNoWindow = true;
       proc.EnableRaisingEvents = true;
-
+      
       proc.Exited += (object sender, System.EventArgs e) => {
         this.ProcExited(task);
       };

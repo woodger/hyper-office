@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using HyperOffice.App.Providers;
 using RestSharp;
 
@@ -7,7 +8,7 @@ namespace HyperOffice.App.Actions
 {
   class HyperDocument
   {
-    public void Snapshot(string url, string fileName)
+    public void Snapshot(Uri uri, string fileName)
     {
       var wordApplication = new WordApplication();
       var wordDocument = wordApplication.OpenDocument(fileName);
@@ -17,16 +18,20 @@ namespace HyperOffice.App.Actions
       wordDocument.Close();
       wordApplication.Quit();
 
-      if (SendResponse(url, buildPath))
+      if (this.SendResponse(uri, buildPath))
       {
         Directory.Delete(buildPath, true);
         File.Delete(fileName);
       }
     }
 
-    private bool SendResponse(string url, string dirName)
+    private bool SendResponse(Uri uri, string dirName)
     {
-      var client = new RestClient(url);
+      var client = new RestClient(uri);
+      
+      client.RemoteCertificateValidationCallback =
+        (sender, cert, chain, err) => true;
+
       var req = new RestRequest();
 
       foreach (var item in Directory.GetFiles(dirName))
