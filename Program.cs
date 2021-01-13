@@ -7,7 +7,7 @@ using HyperOffice.App.Actions;
 
 /**
  * https://github.com/commandlineparser/commandline
- * 
+ *
  * Show more options:
  *    HyperOffice.exe --help
  */
@@ -50,7 +50,7 @@ namespace HyperOffice
     }
 
     [Verb("snapshot",
-      HelpText = "Make screenshot in Office document"
+      HelpText = "Make screenshot in MS Office document"
     )]
     class SnapshotOptions
     {
