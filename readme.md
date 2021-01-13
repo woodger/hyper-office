@@ -2,13 +2,11 @@
 
 [![License](https://img.shields.io/npm/l/express.svg)](https://github.com/woodger/hyper-office/blob/master/LICENSE)
 
-Microsoft Office service hypervisor.
+###### [API docs](Docs/api.md) | [Windows Server](Docs/windows-server.md)
 
 ![yuml diagram](https://yuml.me/woodger/diagram/scruffy;dir:LR/class/[Document{bg:lightsteelblue}]->parse[Hypervisor],[Hypervisor]->publish[Queue{bg:yellow}],[Queue]->[SqliteDB],[Queue]<>-.->thread[Task{bg:yellowgreen}],[Task]->process[Hypervisor])
 
-###### [Windows Server](Docs/api.md) | [Windows Server](Docs/windows-server.md)
-
-This solution implemented in `C#` language on the .NET Framework 4.7 using the `Nancy 2.0` framework.
+Microsoft Office service hypervisor. Solution implemented in `C#` language on the .NET Framework 4.7 using the `Nancy 2.0` framework.
 
 ## Getting Started
 
@@ -50,7 +48,7 @@ Usage:
 
 Commands:
   up               Start the Http server
-  snapshot         Make screenshot in Office document
+  snapshot         Make screenshot in MS Office document
 
 Options:
   -d               Detached mode. Run application in the background
