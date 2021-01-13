@@ -113,7 +113,9 @@ namespace HyperOffice
     static void Snapshot(SnapshotOptions opts)
     {
       var hyperDocument = new HyperDocument();
-      hyperDocument.Snapshot(opts.Url, opts.Input);
+      var uri = new Uri(opts.Url);
+
+      hyperDocument.Snapshot(uri, opts.Input);
     }
   }
 }
